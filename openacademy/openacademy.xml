@@ -10,10 +10,19 @@
                         <group>
                             <field name="name"/>
                             <field name="description"/>
+                            <field name="responsible_id"/>
                         </group>
                         <notebook>
                             <page string="Description">
                                 <field name="description"/>
+                            </page>
+                            <page string="Sessions">
+                                <field name="session_ids">
+                                    <tree string="Registered sessions">
+                                        <field name="name"/>
+                                        <field name="instructor_id"/>
+                                    </tree>
+                                </field>
                             </page>
                             <page string="About">
                                 This is an example of notebooks
@@ -24,7 +33,6 @@
                 </form>
             </field>
         </record>
-        
         <record model="ir.ui.view" id="course_search_view">
             <field name="name">course.search</field>
             <field name="model">openacademy.course</field>
@@ -33,6 +41,18 @@
                     <field name="name"/>
                     <field name="description"/>
                 </search>
+            </field>
+        </record>
+        
+        <!-- override the automatically generated list view for courses -->
+        <record model="ir.ui.view" id="course_tree_view">
+            <field name="name">course.tree</field>
+            <field name="model">openacademy.course</field>
+            <field name="arch" type="xml">
+                <tree string="Course Tree">
+                    <field name="name"/>
+                    <field name="responsible_id"/>
+                </tree>
             </field>
         </record>
 
@@ -68,6 +88,17 @@
         action="openacademy.course_list_action"
         It is not required when it is the same module -->
         
+        
+        <group string="General">
+            <field name="course_id"/>
+            <field name="name"/>
+            <field name="instructor_id"/>
+        </group>
+        <group string="Schedule">
+            <field name="start_date"/>
+            <field name="duration"/>
+            <field name="seats"/>
+        </group>
         <!-- session form view -->
         <record model="ir.ui.view" id="session_form_view">
             <field name="name">session.form</field>
