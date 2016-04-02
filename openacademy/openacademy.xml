@@ -111,6 +111,8 @@
                             <field name="start_date"/>
                             <field name="duration"/>
                             <field name="seats"/>
+                            <label for="attendee_ids"/>
+                            <field name="attendee_ids"/>
                         </group>
                     </sheet>
                 </form>
