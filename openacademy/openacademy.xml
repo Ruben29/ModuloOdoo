@@ -9,13 +9,6 @@
                     <sheet>
                         <group>
                             <field name="name"/>
-                            <field name="description"/>
-                            <filter name="my_courses" string="My Courses"
- +                            domain="[('responsible_id', '=', uid)]"/>
- +                    <group string="Group By">
- +                        <filter name="by_responsible" string="Responsible"
- +                                context="{'group_by': 'responsible_id'}"/>
- +                    </group>
                             <field name="responsible_id"/>
                         </group>
                         <notebook>
@@ -29,16 +22,14 @@
                                         <field name="instructor_id"/>
                                     </tree>
                                 </field>
-                            </page>
-                            <page string="About">
-                                This is an example of notebooks
+
                             </page>
                         </notebook>
-
                     </sheet>
                 </form>
             </field>
         </record>
+        
         <record model="ir.ui.view" id="course_search_view">
             <field name="name">course.search</field>
             <field name="model">openacademy.course</field>
@@ -46,6 +37,12 @@
                 <search>
                     <field name="name"/>
                     <field name="description"/>
+                    <filter name="my_courses" string="My Courses"
+                            domain="[('responsible_id', '=', uid)]"/>
+                    <group string="Group By">
+                        <filter name="by_responsible" string="Responsible"
+                                context="{'group_by': 'responsible_id'}"/>
+                    </group>
                 </search>
             </field>
         </record>
@@ -61,8 +58,7 @@
                 </tree>
             </field>
         </record>
-
-
+        
         <!-- window action -->
         <!--
             The following tag is an action definition for a "window action",
@@ -73,6 +69,7 @@
             <field name="res_model">openacademy.course</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
+            <field name="context" eval="{'search_default_my_courses': 1}"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">Create the first course
                 </p>
@@ -93,18 +90,7 @@
         <!-- Full id location:
         action="openacademy.course_list_action"
         It is not required when it is the same module -->
-        
-        
-        <group string="General">
-            <field name="course_id"/>
-            <field name="name"/>
-            <field name="instructor_id"/>
-        </group>
-        <group string="Schedule">
-            <field name="start_date"/>
-            <field name="duration"/>
-            <field name="seats"/>
-        </group>
+    
         <!-- session form view -->
         <record model="ir.ui.view" id="session_form_view">
             <field name="name">session.form</field>
@@ -112,20 +98,42 @@
             <field name="arch" type="xml">
                 <form string="Session Form">
                     <sheet>
-                        <group>
-                            <field name="name"/>
-                            <field name="start_date"/>
-                            <field name="duration"/>
-                            <field name="seats"/>
-                            <label for="attendee_ids"/>
-                            <field name="attendee_ids"/>
+                        <group>                            
+                            <group string="General">
+                                <field name="course_id"/>
+                                <field name="name"/>
+                                <field name="instructor_id"/>
+                                <field name="active"/>
+                            </group>
+                            <group string="Schedule">
+                                <field name="start_date"/>
+                                <field name="duration"/>
+                                <field name="seats"/>
+                                <field name="taken_seats" widget="progressbar"/>
+                            </group>
                         </group>
+                        <label for="attendee_ids"/>
+                        <field name="attendee_ids"/>
                     </sheet>
                 </form>
             </field>
         </record>
         
-       <!-- calendar view -->
+        <!-- session tree/list view -->
+        <record model="ir.ui.view" id="session_tree_view">
+            <field name="name">session.tree</field>
+            <field name="model">openacademy.session</field>
+            <field name="arch" type="xml">
+                <tree string="Session Tree" decoration-info="duration&lt;5" decoration-danger="duration&gt;15">
+                    <field name="name"/>
+                    <field name="course_id"/>
+                    <field name="duration" invisible="1"/>
+                    <field name="taken_seats" widget="progressbar"/>
+                </tree>
+            </field>
+        </record>
+        
+        <!-- calendar view -->
         <record model="ir.ui.view" id="session_calendar_view">
             <field name="name">session.calendar</field>
             <field name="model">openacademy.session</field>
@@ -137,7 +145,6 @@
                 </calendar>
             </field>
         </record>
-
         
         <record model="ir.ui.view" id="session_gantt_view">
             <field name="name">session.gantt</field>
@@ -150,8 +157,8 @@
                 </gantt>
             </field>
         </record>
-        
-         <record model="ir.ui.view" id="openacademy_session_graph_view">
+
+        <record model="ir.ui.view" id="openacademy_session_graph_view">
             <field name="name">openacademy.session.graph</field>
             <field name="model">openacademy.session</field>
             <field name="arch" type="xml">
@@ -171,7 +178,7 @@
                     <templates>
                         <t t-name="kanban-box">
                             <div
-                                    t-attf-class="oe_kanban_color_{{kanban_getcolor(record.color.raw_value)}}
+                                t-attf-class="oe_kanban_color_{{kanban_getcolor(record.color.raw_value)}}
                                                   oe_kanban_global_click_edit oe_semantic_html_override
                                                   oe_kanban_card {{record.group_fancy==1 ? 'oe_kanban_card_fancy' : ''}}">
                                 <div class="oe_dropdown_kanban">
@@ -207,13 +214,14 @@
                 </kanban>
             </field>
         </record>
-        
+
         <record model="ir.actions.act_window" id="session_list_action">
             <field name="name">Sessions</field>
             <field name="res_model">openacademy.session</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,calendar,gantt,graph,kanban</field>
         </record>
+
         <menuitem id="session_menu" name="Sessions"
                   parent="openacademy_menu"
                   action="session_list_action"/>
